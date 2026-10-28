@@ -1,5 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/changelog/001-create-listing-and-reservation-tables.yaml
-  - include:
-      file: db/changelog/002-limit-listing-title-to-50.yaml
