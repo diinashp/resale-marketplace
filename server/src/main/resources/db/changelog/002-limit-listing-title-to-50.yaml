@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-limit-listing-title-to-50
+      author: dshpakova
+      changes:
+        - modifyDataType:
+            tableName: listing
+            columnName: title
+            newDataType: VARCHAR(50)
