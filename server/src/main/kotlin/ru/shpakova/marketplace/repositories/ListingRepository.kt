@@ -1,7 +1,7 @@
 package ru.shpakova.marketplace.repositories
 
-import ru.shpakova.marketplace.entities.listing.Listing
-import ru.shpakova.marketplace.entities.listing.ListingStatus
+import ru.shpakova.marketplace.domain.listing.Listing
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
 import java.util.UUID
 
 interface ListingRepository {

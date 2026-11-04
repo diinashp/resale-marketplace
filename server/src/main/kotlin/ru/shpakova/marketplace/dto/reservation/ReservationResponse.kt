@@ -1,9 +1,9 @@
 package ru.shpakova.marketplace.dto.reservation
 
-import ru.shpakova.marketplace.entities.reservation.ReservationStatus
+import ru.shpakova.marketplace.domain.reservation.enums.ReservationStatus
 import java.util.UUID
 
-class ReservationResponseDto(
+class ReservationResponse(
     val id: UUID,
     val listingId: UUID,
     val buyerId: UUID,

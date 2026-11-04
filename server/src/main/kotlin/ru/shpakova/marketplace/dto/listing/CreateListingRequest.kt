@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 import java.util.UUID
 
-class CreateListingRequestDto(
+class CreateListingRequest(
     val sellerId: UUID,
     @field:NotBlank(message = "Title cannot be blank")
     @field:Size(max = 50, message = "Title must be at most 50 characters")

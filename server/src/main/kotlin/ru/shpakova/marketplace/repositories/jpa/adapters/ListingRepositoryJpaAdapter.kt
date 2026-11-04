@@ -1,27 +1,31 @@
 package ru.shpakova.marketplace.repositories.jpa.adapters
 
 import org.springframework.stereotype.Repository
-import ru.shpakova.marketplace.entities.listing.Listing
-import ru.shpakova.marketplace.entities.listing.ListingStatus
+import ru.shpakova.marketplace.domain.listing.Listing
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
+import ru.shpakova.marketplace.persistence.jpa.mappers.toDomain
+import ru.shpakova.marketplace.persistence.jpa.mappers.toJpaEntity
 import ru.shpakova.marketplace.repositories.ListingRepository
 import ru.shpakova.marketplace.repositories.jpa.ListingJpaRepository
 import java.util.UUID
 
 @Repository
 class ListingRepositoryJpaAdapter(
-    private val listingJpaRepository: ListingJpaRepository
+    private val listingJpaRepository: ListingJpaRepository,
 ): ListingRepository{
 
     override fun save(listing: Listing) {
-        listingJpaRepository.save(listing)
+        val listingJpaEntity = listing.toJpaEntity()
+        listingJpaRepository.save(listingJpaEntity)
     }
 
     override fun getById(id: UUID): Listing? {
-        return listingJpaRepository.findById(id).orElse(null)
+        val listingJpaEntity = listingJpaRepository.findById(id).orElse(null)
+        return listingJpaEntity?.let { listingJpaEntity.toDomain() }
     }
 
     override fun getAllBySellerIdAndStatus(sellerId: UUID, status: ListingStatus): List<Listing> {
-        return listingJpaRepository.getAllBySellerIdAndStatus(sellerId, status)
+        return listingJpaRepository.getAllBySellerIdAndStatus(sellerId, status).map{it.toDomain()}
     }
 
     override fun deleteById(listingId: UUID) {
@@ -29,6 +33,7 @@ class ListingRepositoryJpaAdapter(
     }
 
     override fun getByIdForUpdate(id: UUID): Listing? {
-        return listingJpaRepository.findByIdForUpdate(id)
+        val listingJpaEntity = listingJpaRepository.findByIdForUpdate(id) ?: return null
+        return listingJpaEntity.toDomain()
     }
 }

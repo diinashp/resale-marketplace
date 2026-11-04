@@ -1,11 +1,11 @@
 package ru.shpakova.marketplace.repositories.jpa
 
 import org.springframework.data.jpa.repository.JpaRepository
-import ru.shpakova.marketplace.entities.reservation.Reservation
+import ru.shpakova.marketplace.persistence.jpa.entities.ReservationJpaEntity
 import java.util.UUID
 
-interface ReservationJpaRepository: JpaRepository<Reservation, UUID> {
-    fun getAllByBuyerId(buyerId: UUID): List<Reservation>
+interface ReservationJpaRepository: JpaRepository<ReservationJpaEntity, UUID> {
+    fun getAllByBuyerId(buyerId: UUID): List<ReservationJpaEntity>
 
-    fun getAllBySellerId(sellerId: UUID): List<Reservation>
+    fun getAllBySellerId(sellerId: UUID): List<ReservationJpaEntity>
 }

@@ -1,7 +1,7 @@
-package ru.shpakova.marketplace.entities
+package ru.shpakova.marketplace.domain.reservation
 
-import ru.shpakova.marketplace.entities.reservation.Reservation
-import ru.shpakova.marketplace.entities.reservation.ReservationStatus
+import ru.shpakova.marketplace.domain.reservation.enums.ReservationStatus
+import ru.shpakova.marketplace.exceptions.InvalidStateTransitionException
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,36 +15,36 @@ class ReservationTest {
 
     @Test
     fun activeReservationCanBeCancelled() {
-        val reservation = reservation()
+        val original = reservation()
 
-        reservation.cancel()
+        val cancelled = original.cancelReservation()
 
-        assertEquals(ReservationStatus.CANCELLED, reservation.status)
+        assertEquals(ReservationStatus.ACTIVE, original.status)
+        assertEquals(ReservationStatus.CANCELLED, cancelled.status)
     }
 
     @Test
     fun activeReservationCanBeCompleted() {
-        val reservation = reservation()
+        val original = reservation()
 
-        reservation.complete()
+        val completed = original.completeReservation()
 
-        assertEquals(ReservationStatus.COMPLETED, reservation.status)
+        assertEquals(ReservationStatus.ACTIVE, original.status)
+        assertEquals(ReservationStatus.COMPLETED, completed.status)
     }
 
     @Test
     fun completedReservationCannotBeCancelled() {
-        val reservation = reservation()
-        reservation.complete()
+        val completed = reservation().completeReservation()
 
-        assertFailsWith<IllegalStateException> { reservation.cancel() }
+        assertFailsWith<InvalidStateTransitionException> { completed.cancelReservation() }
     }
 
     @Test
     fun cancelledReservationCannotBeCompleted() {
-        val reservation = reservation()
-        reservation.cancel()
+        val cancelled = reservation().cancelReservation()
 
-        assertFailsWith<IllegalStateException> { reservation.complete() }
+        assertFailsWith<InvalidStateTransitionException> { cancelled.completeReservation() }
     }
 
     @Test

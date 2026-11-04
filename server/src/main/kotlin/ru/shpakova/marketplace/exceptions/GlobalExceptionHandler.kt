@@ -52,4 +52,14 @@ class GlobalExceptionHandler {
             "message" to message,
         )
     }
+
+    @ExceptionHandler(InvalidStateTransitionException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun handleInvalidStateTransition(exception: InvalidStateTransitionException) : Map<String, Any>{
+        return mapOf(
+            "status" to 409,
+            "error" to "CONFLICT",
+            "message" to (exception.message ?: "Invalid state transition"),
+        )
+    }
 }

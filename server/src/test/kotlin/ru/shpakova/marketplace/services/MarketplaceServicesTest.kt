@@ -1,9 +1,10 @@
 package ru.shpakova.marketplace.services
 
-import ru.shpakova.marketplace.entities.listing.Listing
-import ru.shpakova.marketplace.entities.listing.ListingStatus
-import ru.shpakova.marketplace.entities.reservation.Reservation
-import ru.shpakova.marketplace.entities.reservation.ReservationStatus
+import ru.shpakova.marketplace.domain.listing.Listing
+import ru.shpakova.marketplace.domain.listing.reserveListing
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
+import ru.shpakova.marketplace.domain.reservation.Reservation
+import ru.shpakova.marketplace.domain.reservation.enums.ReservationStatus
 import ru.shpakova.marketplace.exceptions.ListingNotFoundException
 import ru.shpakova.marketplace.exceptions.ReservationNotFoundException
 import ru.shpakova.marketplace.repositories.ListingRepository
@@ -42,7 +43,7 @@ class MarketplaceServicesTest {
     fun sellerListingsAreFilteredBySellerAndStatus() {
         val sellerId = UUID.randomUUID()
         val available = listing(sellerId)
-        val reserved = listing(sellerId).also { it.reserve() }
+        val reserved = listing(sellerId).reserveListing()
         val anotherSeller = listing(UUID.randomUUID())
         listOf(available, reserved, anotherSeller).forEach(listings::save)
 
@@ -72,7 +73,8 @@ class MarketplaceServicesTest {
 
         val reservation = reservationService.placeReservation(buyerId, listing.id)
 
-        assertEquals(ListingStatus.RESERVED, listing.status)
+        assertEquals(ListingStatus.AVAILABLE, listing.status)
+        assertEquals(ListingStatus.RESERVED, listings.getById(listing.id)?.status)
         assertEquals(ReservationStatus.ACTIVE, reservation.status)
         assertEquals(reservation, reservations.getById(reservation.id))
     }
@@ -85,7 +87,7 @@ class MarketplaceServicesTest {
         assertFailsWith<IllegalArgumentException> {
             reservationService.placeReservation(listing.sellerId, listing.id)
         }
-        assertEquals(ListingStatus.AVAILABLE, listing.status)
+        assertEquals(ListingStatus.AVAILABLE, listings.getById(listing.id)?.status)
         assertTrue(reservations.all().isEmpty())
     }
 
@@ -102,8 +104,8 @@ class MarketplaceServicesTest {
 
         reservationService.cancelReservation(reservation.buyerId, reservation.id)
 
-        assertEquals(ListingStatus.AVAILABLE, listing.status)
-        assertEquals(ReservationStatus.CANCELLED, reservation.status)
+        assertEquals(ListingStatus.AVAILABLE, listings.getById(listing.id)?.status)
+        assertEquals(ReservationStatus.CANCELLED, reservations.getById(reservation.id)?.status)
     }
 
     @Test
@@ -114,8 +116,8 @@ class MarketplaceServicesTest {
             reservationService.cancelReservation(UUID.randomUUID(), reservation.id)
         }
 
-        assertEquals(ListingStatus.RESERVED, listing.status)
-        assertEquals(ReservationStatus.ACTIVE, reservation.status)
+        assertEquals(ListingStatus.RESERVED, listings.getById(listing.id)?.status)
+        assertEquals(ReservationStatus.ACTIVE, reservations.getById(reservation.id)?.status)
     }
 
     @Test
@@ -124,8 +126,8 @@ class MarketplaceServicesTest {
 
         reservationService.confirmReceipt(reservation.buyerId, reservation.id)
 
-        assertEquals(ListingStatus.SOLD, listing.status)
-        assertEquals(ReservationStatus.COMPLETED, reservation.status)
+        assertEquals(ListingStatus.SOLD, listings.getById(listing.id)?.status)
+        assertEquals(ReservationStatus.COMPLETED, reservations.getById(reservation.id)?.status)
     }
 
     @Test
@@ -136,8 +138,8 @@ class MarketplaceServicesTest {
             reservationService.confirmReceipt(reservation.sellerId, reservation.id)
         }
 
-        assertEquals(ListingStatus.RESERVED, listing.status)
-        assertEquals(ReservationStatus.ACTIVE, reservation.status)
+        assertEquals(ListingStatus.RESERVED, listings.getById(listing.id)?.status)
+        assertEquals(ReservationStatus.ACTIVE, reservations.getById(reservation.id)?.status)
     }
 
     @Test
@@ -151,7 +153,7 @@ class MarketplaceServicesTest {
         val listing = listing(UUID.randomUUID())
         listings.save(listing)
         val reservation = reservationService.placeReservation(UUID.randomUUID(), listing.id)
-        return listing to reservation
+        return listings.getById(listing.id)!! to reservations.getById(reservation.id)!!
     }
 
     private fun listing(sellerId: UUID) = Listing(

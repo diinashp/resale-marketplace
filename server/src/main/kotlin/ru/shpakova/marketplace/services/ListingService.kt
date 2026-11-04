@@ -2,8 +2,8 @@ package ru.shpakova.marketplace.services
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import ru.shpakova.marketplace.entities.listing.Listing
-import ru.shpakova.marketplace.entities.listing.ListingStatus
+import ru.shpakova.marketplace.domain.listing.Listing
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
 import ru.shpakova.marketplace.exceptions.ListingNotFoundException
 import ru.shpakova.marketplace.repositories.ListingRepository
 import java.math.BigDecimal

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import ru.shpakova.marketplace.dto.listing.CreateListingRequestDto
-import ru.shpakova.marketplace.dto.listing.ListingResponseDto
-import ru.shpakova.marketplace.entities.listing.ListingStatus
-import ru.shpakova.marketplace.mappers.ListingMapper
+import ru.shpakova.marketplace.dto.listing.CreateListingRequest
+import ru.shpakova.marketplace.dto.listing.ListingResponse
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
+import ru.shpakova.marketplace.mappers.toResponse
 import ru.shpakova.marketplace.services.ListingService
 import java.util.UUID
 
@@ -22,33 +22,32 @@ import java.util.UUID
 @RequestMapping("/api/listing")
 class ListingController(
     private val listingService: ListingService,
-    private val listingMapper: ListingMapper,
 ) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createListing(@Valid @RequestBody createListingRequestDto: CreateListingRequestDto) : ListingResponseDto {
+    fun createListing(@Valid @RequestBody createListingRequestDto: CreateListingRequest) : ListingResponse {
         val listing = listingService.createListing(
             createListingRequestDto.sellerId,
             createListingRequestDto.title,
             createListingRequestDto.description,
             createListingRequestDto.price)
 
-       return listingMapper.toResponse(listing)
+       return listing.toResponse()
     }
 
     @GetMapping("/{listingId}")
-    fun getListing(@PathVariable listingId: UUID): ListingResponseDto {
+    fun getListing(@PathVariable listingId: UUID): ListingResponse {
         val listing = listingService.getListing(listingId)
-        return listingMapper.toResponse(listing)
+        return listing.toResponse()
     }
 
     @GetMapping
     fun getSellerListingsByStatus(
         @RequestParam sellerId: UUID,
         @RequestParam status: ListingStatus
-    ): List<ListingResponseDto>{
-        return listingService.getSellerListingsByStatus(sellerId, status).map{listingMapper.toResponse(it)}
+    ): List<ListingResponse>{
+        return listingService.getSellerListingsByStatus(sellerId, status).map{it.toResponse()}
     }
 
     @DeleteMapping("/{listingId}")

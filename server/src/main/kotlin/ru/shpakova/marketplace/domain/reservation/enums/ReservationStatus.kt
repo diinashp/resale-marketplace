@@ -1,4 +1,4 @@
-package ru.shpakova.marketplace.entities.reservation
+package ru.shpakova.marketplace.domain.reservation.enums
 
 enum class ReservationStatus {
     ACTIVE,

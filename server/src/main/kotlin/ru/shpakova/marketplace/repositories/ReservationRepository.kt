@@ -1,6 +1,6 @@
 package ru.shpakova.marketplace.repositories
 
-import ru.shpakova.marketplace.entities.reservation.Reservation
+import ru.shpakova.marketplace.domain.reservation.Reservation
 import java.util.UUID
 
 interface ReservationRepository {

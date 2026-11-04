@@ -1,11 +1,14 @@
 package ru.shpakova.marketplace.mappers
 
-import org.springframework.stereotype.Component
-import ru.shpakova.marketplace.dto.listing.ListingResponseDto
-import ru.shpakova.marketplace.entities.listing.Listing
+import ru.shpakova.marketplace.dto.listing.ListingResponse
+import ru.shpakova.marketplace.domain.listing.Listing
 
-@Component
-class ListingMapper {
-    fun toResponse(listing: Listing) =
-        ListingResponseDto(listing.id, listing.sellerId, listing.title, listing.description, listing.price, listing.status)
-}
+fun Listing.toResponse() =
+    ListingResponse(
+        id = id,
+        sellerId = sellerId,
+        title = title,
+        description = description,
+        price = price,
+        status = status
+    )

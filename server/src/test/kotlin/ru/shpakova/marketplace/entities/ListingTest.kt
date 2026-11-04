@@ -1,7 +1,7 @@
-package ru.shpakova.marketplace.entities
+package ru.shpakova.marketplace.domain.listing
 
-import ru.shpakova.marketplace.entities.listing.Listing
-import ru.shpakova.marketplace.entities.listing.ListingStatus
+import ru.shpakova.marketplace.domain.listing.enums.ListingStatus
+import ru.shpakova.marketplace.exceptions.InvalidStateTransitionException
 import java.math.BigDecimal
 import java.util.UUID
 import kotlin.test.Test
@@ -11,48 +11,43 @@ import kotlin.test.assertFailsWith
 class ListingTest {
     @Test
     fun newListingStartsAsAvailable() {
-        val listing = listing()
-
-        assertEquals(ListingStatus.AVAILABLE, listing.status)
+        assertEquals(ListingStatus.AVAILABLE, listing().status)
     }
 
     @Test
     fun reservationCanBePlacedAndReleased() {
-        val listing = listing()
+        val original = listing()
 
-        listing.reserve()
-        assertEquals(ListingStatus.RESERVED, listing.status)
+        val reserved = original.reserveListing()
+        val released = reserved.releaseReservation()
 
-        listing.releaseReservation()
-        assertEquals(ListingStatus.AVAILABLE, listing.status)
+        assertEquals(ListingStatus.AVAILABLE, original.status)
+        assertEquals(ListingStatus.RESERVED, reserved.status)
+        assertEquals(ListingStatus.AVAILABLE, released.status)
     }
 
     @Test
     fun reservedListingCanBeMarkedAsSold() {
-        val listing = listing()
+        val sold = listing().reserveListing().markAsSold()
 
-        listing.reserve()
-        listing.markAsSold()
-
-        assertEquals(ListingStatus.SOLD, listing.status)
+        assertEquals(ListingStatus.SOLD, sold.status)
     }
 
     @Test
     fun cannotReserveListingTwice() {
-        val listing = listing()
-        listing.reserve()
+        val reserved = listing().reserveListing()
 
-        assertFailsWith<IllegalStateException> { listing.reserve() }
+        assertFailsWith<InvalidStateTransitionException> { reserved.reserveListing() }
     }
 
     @Test
     fun cannotReleaseAnAvailableListing() {
-        assertFailsWith<IllegalStateException> { listing().releaseReservation() }
+        assertFailsWith<InvalidStateTransitionException> { listing().releaseReservation() }
     }
 
     @Test
     fun cannotSellAnAvailableListing() {
-        assertFailsWith<IllegalStateException> { listing().markAsSold() }
+        assertFailsWith<InvalidStateTransitionException> { listing().markAsSold() }
     }
 
     @Test

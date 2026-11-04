@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import ru.shpakova.marketplace.dto.reservation.CreateReservationRequestDto
-import ru.shpakova.marketplace.dto.reservation.ReservationResponseDto
-import ru.shpakova.marketplace.mappers.ReservationMapper
+import ru.shpakova.marketplace.dto.reservation.CreateReservationRequest
+import ru.shpakova.marketplace.dto.reservation.ReservationResponse
+import ru.shpakova.marketplace.mappers.toResponse
 import ru.shpakova.marketplace.services.ReservationService
 import java.util.UUID
 
@@ -19,15 +19,14 @@ import java.util.UUID
 @RequestMapping("/api/reservations")
 class ReservationController(
     private val reservationService: ReservationService,
-    private val reservationMapper: ReservationMapper,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun placeReservation(@RequestBody createReservationRequestDto: CreateReservationRequestDto): ReservationResponseDto {
+    fun placeReservation(@RequestBody createReservationRequestDto: CreateReservationRequest): ReservationResponse {
         val reservation = reservationService.placeReservation(
             createReservationRequestDto.buyerId,
             createReservationRequestDto.listingId)
-        return reservationMapper.toResponse(reservation)
+        return reservation.toResponse()
     }
 
     @PostMapping("/{reservationId}/cancel")
@@ -44,18 +43,18 @@ class ReservationController(
     }
 
     @GetMapping("/{reservationId}")
-    fun getReservation(@PathVariable reservationId: UUID): ReservationResponseDto {
+    fun getReservation(@PathVariable reservationId: UUID): ReservationResponse {
         val reservation = reservationService.getReservation(reservationId)
-        return reservationMapper.toResponse(reservation)
+        return reservation.toResponse()
     }
 
     @GetMapping("/buyer")
-    fun getBuyerReservations(@RequestParam buyerId: UUID): List<ReservationResponseDto> {
-        return reservationService.getBuyerReservations(buyerId).map { reservationMapper.toResponse(it) }
+    fun getBuyerReservations(@RequestParam buyerId: UUID): List<ReservationResponse> {
+        return reservationService.getBuyerReservations(buyerId).map { it.toResponse() }
     }
 
     @GetMapping("/seller")
-    fun getSellerReservations(@RequestParam sellerId: UUID): List<ReservationResponseDto> {
-        return reservationService.getSellerReservations(sellerId).map { reservationMapper.toResponse(it) }
+    fun getSellerReservations(@RequestParam sellerId: UUID): List<ReservationResponse> {
+        return reservationService.getSellerReservations(sellerId).map { it.toResponse() }
     }
 }

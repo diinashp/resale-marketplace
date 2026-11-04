@@ -2,7 +2,7 @@ package ru.shpakova.marketplace.dto.reservation
 
 import java.util.UUID
 
-class CreateReservationRequestDto(
+class CreateReservationRequest(
     val listingId: UUID,
     val buyerId: UUID,
-) {}
+)

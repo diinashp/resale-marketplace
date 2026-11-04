@@ -1,4 +1,4 @@
-package ru.shpakova.marketplace.entities.listing
+package ru.shpakova.marketplace.domain.listing.enums
 
 enum class ListingStatus {
     AVAILABLE,
